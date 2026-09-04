@@ -1,0 +1,22 @@
+# State & artifacts (never commit)
+scene.json
+output.png
+sessions/
+toi-data/
+test_photo.png
+test_logo.png
+final_test_output.png
+*.log
+
+# Local config with real tokens (see .env.example)
+.env
+.env.*
+!.env.example
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Temp/scratch
+tmp_*

@@ -1,0 +1,40 @@
+# Deployment: VPS + Docker + Caddy (automatic HTTPS).
+#   cp .env.example .env   # fill TOI_DOMAIN + TOI_USERS (long random tokens)
+#   docker compose up -d --build
+# Scene state and media live on the ./toi-data volume — safe across
+# redeploys and rollbacks. Rollback: tag-based (see README "Деплой").
+services:
+  toi:
+    build: .
+    image: text-on-image:${TOI_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      TOI_USERS: ${TOI_USERS:?set TOI_USERS in .env}
+      TOI_MAX_SCENES: ${TOI_MAX_SCENES:-16}
+    volumes:
+      - ./toi-data:/data          # scenes (TOI_DATA) + /data/media
+    networks: [mcp]
+    # No ports: 8080 stays internal, Caddy is the only public face.
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data          # certificates survive redeploys
+      - caddy-config:/config
+    environment:
+      TOI_DOMAIN: ${TOI_DOMAIN:?set TOI_DOMAIN (A record -> this VPS) in .env}
+    networks: [mcp]
+    depends_on:
+      - toi
+
+networks:
+  mcp:
+
+volumes:
+  caddy-data:
+  caddy-config:

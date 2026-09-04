@@ -1,0 +1,10 @@
+# Exact versions from the verified local venv (Python 3.14.7).
+# The Docker image MUST build from this file: mcp 2.x APIs move fast and
+# our server is written and tested against mcp==2.1.1.
+mcp==2.1.1
+pillow==12.3.0
+uvicorn==0.52.4
+starlette==1.6.0
+anyio==4.14.2
+httpx2==2.12.0
+pydantic==2.13.5

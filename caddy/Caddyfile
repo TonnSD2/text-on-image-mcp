@@ -1,0 +1,13 @@
+# Reverse proxy for the text-on-image MCP server. Caddy handles TLS
+# automatically (Let's Encrypt) once TOI_DOMAIN points at this host.
+{$TOI_DOMAIN} {
+	# Streamable HTTP = long-lived SSE responses: disable buffering and
+	# keep read timeouts long enough for multi-minute render jobs.
+	reverse_proxy toi:8080 {
+		flush_interval -1
+		transport http {
+			read_timeout  600s
+			write_timeout 600s
+		}
+	}
+}

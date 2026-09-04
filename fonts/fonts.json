@@ -1,0 +1,181 @@
+{
+  "Montserrat": {
+    "regular": "fonts/Montserrat/Montserrat-regular.ttf",
+    "bold": "fonts/Montserrat/Montserrat-bold.ttf",
+    "italic": "fonts/Montserrat/Montserrat-italic.ttf",
+    "bold_italic": "fonts/Montserrat/Montserrat-bold_italic.ttf"
+  },
+  "Inter": {
+    "regular": "fonts/Inter/Inter-regular.ttf",
+    "bold": "fonts/Inter/Inter-bold.ttf",
+    "italic": "fonts/Inter/Inter-italic.ttf",
+    "bold_italic": "fonts/Inter/Inter-bold_italic.ttf"
+  },
+  "Roboto": {
+    "regular": "fonts/Roboto/Roboto-regular.ttf",
+    "bold": "fonts/Roboto/Roboto-bold.ttf",
+    "italic": "fonts/Roboto/Roboto-italic.ttf",
+    "bold_italic": "fonts/Roboto/Roboto-bold_italic.ttf"
+  },
+  "Open Sans": {
+    "regular": "fonts/Open Sans/Open Sans-regular.ttf",
+    "bold": "fonts/Open Sans/Open Sans-bold.ttf",
+    "italic": "fonts/Open Sans/Open Sans-italic.ttf",
+    "bold_italic": "fonts/Open Sans/Open Sans-bold_italic.ttf"
+  },
+  "Lato": {
+    "regular": "fonts/Lato/Lato-regular.ttf",
+    "bold": "fonts/Lato/Lato-bold.ttf",
+    "italic": "fonts/Lato/Lato-italic.ttf",
+    "bold_italic": "fonts/Lato/Lato-bold_italic.ttf"
+  },
+  "Poppins": {
+    "regular": "fonts/Poppins/Poppins-regular.ttf",
+    "bold": "fonts/Poppins/Poppins-bold.ttf",
+    "italic": "fonts/Poppins/Poppins-italic.ttf",
+    "bold_italic": "fonts/Poppins/Poppins-bold_italic.ttf"
+  },
+  "Source Sans 3": {
+    "regular": "fonts/Source Sans 3/Source Sans 3-regular.ttf",
+    "bold": "fonts/Source Sans 3/Source Sans 3-bold.ttf",
+    "italic": "fonts/Source Sans 3/Source Sans 3-italic.ttf",
+    "bold_italic": "fonts/Source Sans 3/Source Sans 3-bold_italic.ttf"
+  },
+  "Raleway": {
+    "regular": "fonts/Raleway/Raleway-regular.ttf",
+    "bold": "fonts/Raleway/Raleway-bold.ttf",
+    "italic": "fonts/Raleway/Raleway-italic.ttf",
+    "bold_italic": "fonts/Raleway/Raleway-bold_italic.ttf"
+  },
+  "Oswald": {
+    "regular": "fonts/Oswald/Oswald-regular.ttf",
+    "bold": "fonts/Oswald/Oswald-bold.ttf"
+  },
+  "Merriweather": {
+    "regular": "fonts/Merriweather/Merriweather-regular.ttf",
+    "bold": "fonts/Merriweather/Merriweather-bold.ttf",
+    "italic": "fonts/Merriweather/Merriweather-italic.ttf",
+    "bold_italic": "fonts/Merriweather/Merriweather-bold_italic.ttf"
+  },
+  "Ubuntu": {
+    "regular": "fonts/Ubuntu/Ubuntu-regular.ttf",
+    "bold": "fonts/Ubuntu/Ubuntu-bold.ttf",
+    "italic": "fonts/Ubuntu/Ubuntu-italic.ttf",
+    "bold_italic": "fonts/Ubuntu/Ubuntu-bold_italic.ttf"
+  },
+  "Nunito": {
+    "regular": "fonts/Nunito/Nunito-regular.ttf",
+    "bold": "fonts/Nunito/Nunito-bold.ttf",
+    "italic": "fonts/Nunito/Nunito-italic.ttf",
+    "bold_italic": "fonts/Nunito/Nunito-bold_italic.ttf"
+  },
+  "Nunito Sans": {
+    "regular": "fonts/Nunito Sans/Nunito Sans-regular.ttf",
+    "bold": "fonts/Nunito Sans/Nunito Sans-bold.ttf",
+    "italic": "fonts/Nunito Sans/Nunito Sans-italic.ttf",
+    "bold_italic": "fonts/Nunito Sans/Nunito Sans-bold_italic.ttf"
+  },
+  "Playfair Display": {
+    "regular": "fonts/Playfair Display/Playfair Display-regular.ttf",
+    "bold": "fonts/Playfair Display/Playfair Display-bold.ttf",
+    "italic": "fonts/Playfair Display/Playfair Display-italic.ttf",
+    "bold_italic": "fonts/Playfair Display/Playfair Display-bold_italic.ttf"
+  },
+  "Rubik": {
+    "regular": "fonts/Rubik/Rubik-regular.ttf",
+    "bold": "fonts/Rubik/Rubik-bold.ttf",
+    "italic": "fonts/Rubik/Rubik-italic.ttf",
+    "bold_italic": "fonts/Rubik/Rubik-bold_italic.ttf"
+  },
+  "Work Sans": {
+    "regular": "fonts/Work Sans/Work Sans-regular.ttf",
+    "bold": "fonts/Work Sans/Work Sans-bold.ttf",
+    "italic": "fonts/Work Sans/Work Sans-italic.ttf",
+    "bold_italic": "fonts/Work Sans/Work Sans-bold_italic.ttf"
+  },
+  "Roboto Condensed": {
+    "regular": "fonts/Roboto Condensed/Roboto Condensed-regular.ttf",
+    "bold": "fonts/Roboto Condensed/Roboto Condensed-bold.ttf",
+    "italic": "fonts/Roboto Condensed/Roboto Condensed-italic.ttf",
+    "bold_italic": "fonts/Roboto Condensed/Roboto Condensed-bold_italic.ttf"
+  },
+  "PT Sans": {
+    "regular": "fonts/PT Sans/PT Sans-regular.ttf",
+    "bold": "fonts/PT Sans/PT Sans-bold.ttf",
+    "italic": "fonts/PT Sans/PT Sans-italic.ttf",
+    "bold_italic": "fonts/PT Sans/PT Sans-bold_italic.ttf"
+  },
+  "Fira Sans": {
+    "regular": "fonts/Fira Sans/Fira Sans-regular.ttf",
+    "bold": "fonts/Fira Sans/Fira Sans-bold.ttf",
+    "italic": "fonts/Fira Sans/Fira Sans-italic.ttf",
+    "bold_italic": "fonts/Fira Sans/Fira Sans-bold_italic.ttf"
+  },
+  "Barlow": {
+    "regular": "fonts/Barlow/Barlow-regular.ttf",
+    "bold": "fonts/Barlow/Barlow-bold.ttf",
+    "italic": "fonts/Barlow/Barlow-italic.ttf",
+    "bold_italic": "fonts/Barlow/Barlow-bold_italic.ttf"
+  },
+  "DM Sans": {
+    "regular": "fonts/DM Sans/DM Sans-regular.ttf",
+    "bold": "fonts/DM Sans/DM Sans-bold.ttf",
+    "italic": "fonts/DM Sans/DM Sans-italic.ttf",
+    "bold_italic": "fonts/DM Sans/DM Sans-bold_italic.ttf"
+  },
+  "Manrope": {
+    "regular": "fonts/Manrope/Manrope-regular.ttf",
+    "bold": "fonts/Manrope/Manrope-bold.ttf"
+  },
+  "Karla": {
+    "regular": "fonts/Karla/Karla-regular.ttf",
+    "bold": "fonts/Karla/Karla-bold.ttf",
+    "italic": "fonts/Karla/Karla-italic.ttf",
+    "bold_italic": "fonts/Karla/Karla-bold_italic.ttf"
+  },
+  "Josefin Sans": {
+    "regular": "fonts/Josefin Sans/Josefin Sans-regular.ttf",
+    "bold": "fonts/Josefin Sans/Josefin Sans-bold.ttf",
+    "italic": "fonts/Josefin Sans/Josefin Sans-italic.ttf",
+    "bold_italic": "fonts/Josefin Sans/Josefin Sans-bold_italic.ttf"
+  },
+  "Libre Baskerville": {
+    "regular": "fonts/Libre Baskerville/Libre Baskerville-regular.ttf",
+    "bold": "fonts/Libre Baskerville/Libre Baskerville-bold.ttf",
+    "italic": "fonts/Libre Baskerville/Libre Baskerville-italic.ttf",
+    "bold_italic": "fonts/Libre Baskerville/Libre Baskerville-bold_italic.ttf"
+  },
+  "Cormorant Garamond": {
+    "regular": "fonts/Cormorant Garamond/Cormorant Garamond-regular.ttf",
+    "bold": "fonts/Cormorant Garamond/Cormorant Garamond-bold.ttf",
+    "italic": "fonts/Cormorant Garamond/Cormorant Garamond-italic.ttf",
+    "bold_italic": "fonts/Cormorant Garamond/Cormorant Garamond-bold_italic.ttf"
+  },
+  "Space Grotesk": {
+    "regular": "fonts/Space Grotesk/Space Grotesk-regular.ttf",
+    "bold": "fonts/Space Grotesk/Space Grotesk-bold.ttf"
+  },
+  "Quicksand": {
+    "regular": "fonts/Quicksand/Quicksand-regular.ttf",
+    "bold": "fonts/Quicksand/Quicksand-bold.ttf"
+  },
+  "Mulish": {
+    "regular": "fonts/Mulish/Mulish-regular.ttf",
+    "bold": "fonts/Mulish/Mulish-bold.ttf",
+    "italic": "fonts/Mulish/Mulish-italic.ttf",
+    "bold_italic": "fonts/Mulish/Mulish-bold_italic.ttf"
+  },
+  "Bebas Neue": {
+    "regular": "fonts/Bebas Neue/Bebas Neue-regular.ttf"
+  },
+  "Lobster": {
+    "regular": "fonts/Lobster/Lobster-regular.ttf"
+  },
+  "Pacifico": {
+    "regular": "fonts/Pacifico/Pacifico-regular.ttf"
+  },
+  "Caveat": {
+    "regular": "fonts/Caveat/Caveat-regular.ttf",
+    "bold": "fonts/Caveat/Caveat-bold.ttf"
+  }
+}
