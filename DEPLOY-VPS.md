@@ -94,6 +94,48 @@ TOI_TAG=dev-2 docker compose up -d --build   # новый тег; старый �
 Состояние сцен и загрузок живёт в `./toi-data/` (volume) — переживает
 обновления, откаты и пересборку образа. Бэкап = копия этой папки.
 
+## Вариант без домена и HTTPS (HTTP по IP)
+
+Работает на тех же шагах 1–4, Caddy и домен не нужны. Быстрый путь — готовый
+образ вместо compose-связки с Caddy:
+
+```bash
+cd text-on-image-mcp
+TOKEN=$(openssl rand -hex 16) && echo "Токен: $TOKEN"   # запомни
+
+docker build -t toi .
+docker run -d --name toi --restart unless-stopped \
+  -p 8080:8080 \
+  -e TOI_USERS="$TOKEN=me" \
+  -e TOI_REMOTE_MODE=1 \
+  -e TOI_MAX_SCENES=16 \
+  -v "$PWD/toi-data:/data" \
+  toi
+
+docker logs toi | grep Uvicorn    # 'Uvicorn running on 0.0.0.0:8080'
+```
+
+Клиент: `http://IP_СЕРВЕРА:8080/mcp` + заголовок `Authorization: Bearer <токен>`.
+Обновление: `git pull && docker build -t toi . && docker rm -f toi`, затем тот
+же `docker run` (данные в `./toi-data` сохранятся).
+
+Без Docker — venv + systemd: `.venv` из `requirements.txt`, юнит с
+`ExecStart=.../.venv/bin/python server.py --host 0.0.0.0 --port 8080` и
+`Environment=TOI_USERS/TOI_REMOTE_MODE/TOI_DATA`. Учти: проверенная среда —
+Python 3.14 (см. `requirements.lock`), а Ubuntu 24.04 несёт системный 3.12 —
+конфигурация непроверенная, поэтому docker-путь предпочтительнее.
+
+⚠️ **Без TLS токен и картинки идут открытым текстом.** Минимальная защита —
+выбери одно:
+- **IP-allowlist:** `ufw allow from ТВОЙ_IP to any port 8080 proto tcp`
+  (и не открывай 8080 правилом `ufw allow 8080/tcp`).
+- **SSH-туннель (рекомендуется):** публикуй порт только на loopback
+  (`-p 127.0.0.1:8080:8080`), 8080 в ufw не открывай вовсе; на своей машине
+  `ssh -N -L 8080:localhost:8080 root@IP`, клиенту — `http://localhost:8080/mcp`.
+
+`TOI_REMOTE_MODE=1` при открытом HTTP оставляй включённым — это основной
+ограничитель: клиент не получает доступ к файлам сервера.
+
 ## Если не работает
 | Симптом | Причина / решение |
 |---|---|
