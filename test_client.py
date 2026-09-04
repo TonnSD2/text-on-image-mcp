@@ -228,6 +228,24 @@ async def main() -> None:
             assert out["image_base64"], "no base64 in render()"
             shutil.copy(out["image_path"], BASE / "final_test_output.png")
             print(f"render OK -> {BASE/'final_test_output.png'}")
+
+            # ---- H: byte-payload tools (hosted-deployment API) in normal mode
+            import base64 as b64
+            raw = Path(photo).read_bytes()
+            h1 = await call("load_image_data",
+                            image_base64="data:image/png;base64,"
+                                         + b64.b64encode(raw).decode(),
+                            filename="upload.png")
+            assert h1["state"]["width"] == 1200, "wrong width from bytes"
+            assert h1["state"]["objects"] == [], "scene not cleared"
+            await call("add_text", text="BYTES-OK", family="Inter", size=40,
+                       x=30, y=30)
+            assert len((await call("get_state"))["objects"]) == 1
+            res = await s.call_tool("load_image_data",
+                                    {"image_base64": "!!!garbage!!!"})
+            assert res.is_error, "garbage base64 accepted"
+            print("H: load_image_data/add_image_data OK")
+
             print("\nALL TESTS PASSED")
 
 

@@ -13,7 +13,8 @@
 - Python 3 + **Pillow** (весь рендер) + **mcp** (SDK 2.x, MCPServer, транспорт Streamable HTTP)
 - 33 бесплатных Google Fonts (статические TTF, скачаны локально), в т.ч.
   script/display: Lobster, Pacifico, Caveat
-- 36 инструментов, 5 типов объектов, rich-text runs, градиенты, выравнивание,
+- 38 инструментов (в `TOI_REMOTE_MODE=1` — 36), 5 типов объектов, rich-text runs,
+  градиенты, выравнивание,
   мультисессионность (изолированные сцены), глобальные фото-эффекты, undo/redo
 
 ## Быстрый старт
@@ -80,6 +81,8 @@ undo/redo + свой `scene.json`/`output.png` + свой lock. Одна тих�
 | `TOI_DATA` | корень сцен (default `<workdir>/sessions`); layout `<TOI_DATA>/<workspace>/<scene>/` |
 | `TOI_MAX_SCENES` | LRU-лимит живых сцен в памяти (default 16; состояние на диске, вытеснение безопасно, теряется только undo-история) |
 | `TOI_MEDIA_ROOT` | если задан — `load_image`/`add_image` принимают только пути внутри этого корня (resolve до проверки: `..` и симлинки не работают). Не задан = полный локальный доступ (dev/webapp-пул). **Для внешнего хостинга обязателен** |
+| `TOI_REMOTE_MODE=1` | режим «наружу»: из `tools/list` убираются `load_image`/`add_image` (работа с путями), остаются только byte-API: `load_image_data`/`add_image_data` (base64) |
+| `TOI_MAX_UPLOAD_MB` | лимит размера загружаемого base64-изображения (default 20) |
 
 Пример для внешней системы (N параллельных генераций одним токеном):
 ```
@@ -107,8 +110,10 @@ BASE=https://<домен> TOKEN=<токен> bash test_deploy_smoke.sh
 ```
 
 Клиенты: `https://<домен>/mcp?token=<токен>&scene=<job>` (или заголовок
-`Authorization: Bearer`). Фото для `load_image` кладутся в `./toi-data/media/`
-(= `/data/media` внутри контейнера).
+`Authorization: Bearer`). Рекомендуемый вход для наружного деплоя —
+`TOI_REMOTE_MODE=1`: клиент присылает фото как base64 (`load_image_data`),
+никаких путей на сервере; инструменты с путями при этом исчезают из API.
+(Локальный путь-режим: фото в `./toi-data/media/` = `/data/media`.)
 
 Обновление и откат (состояние сцен живёт в `./toi-data`, переживает и то, и другое):
 ```bash
@@ -160,10 +165,10 @@ Linear: `angle=0` — сверху (`from`) вниз (`to`), дальше по �
 `from` в центре. Работает с любым `rotation` фигуры. `update_shape(fill_gradient={})`
 снимает градиент.
 
-## Инструменты (36)
+## Инструменты (38)
 | Группа | Инструменты |
 |---|---|
-| Шрифты/загрузка | `list_fonts`, `load_image` |
+| Шрифты/загрузка | `list_fonts`, `load_image`, `load_image_data` (base64/data-URL, без путей) |
 | Текст (A) | `add_text` (angle, outline, line_spacing, align, opacity, **runs**), `update_text` (**runs**), `auto_fit_text`, `measure_text`, `scale_text` |
 | Эффекты объекта | `add_shadow`, `add_glow`, `remove_shadow`, `set_opacity` |
 | Геометрия (B) | `add_shape` (rectangle/rounded_rectangle/ellipse/regular_polygon, **fill_gradient**), `add_polygon`, `add_arrow`, `update_shape` (**fill_gradient**), `resize_object` |

@@ -74,6 +74,64 @@ def _media_path(path: str) -> Path:
     return p
 
 
+# Byte-payload image API for hosted/remote deployments: the client sends the
+# image itself (base64 / data-URL), the server stores it inside the current
+# scene's uploads/ dir — the client never sees or supplies any path.
+# TOI_REMOTE_MODE=1 additionally removes the path-based tools from tools/list.
+REMOTE_MODE = os.environ.get("TOI_REMOTE_MODE") == "1"
+MAX_UPLOAD_MB = int(os.environ.get("TOI_MAX_UPLOAD_MB", "20"))
+
+
+def _decode_image_b64(image_base64: str) -> bytes:
+    """Decode a base64/data-URL payload with size and real-image validation."""
+    data = (image_base64 or "").strip()
+    if data.startswith("data:") and "," in data:
+        data = data.split(",", 1)[1]
+    data = "".join(data.split())  # tolerate wrapped/newlined base64
+    limit = MAX_UPLOAD_MB * 1024 * 1024
+    if len(data) > limit * 4 // 3 + 4:  # cheap pre-decode guard
+        raise ValueError(f"Image exceeds TOI_MAX_UPLOAD_MB={MAX_UPLOAD_MB}")
+    try:
+        raw = base64.b64decode(data, validate=True)
+    except Exception as exc:
+        raise ValueError("image_base64 is not valid base64") from exc
+    if not raw or len(raw) > limit:
+        raise ValueError(f"Image empty or over TOI_MAX_UPLOAD_MB={MAX_UPLOAD_MB}")
+    import io
+    from PIL import Image
+    try:
+        with Image.open(io.BytesIO(raw)) as im:
+            im.verify()  # real image header + structure, not just bytes
+    except Exception as exc:
+        raise ValueError("image_base64 does not contain a decodable image") from exc
+    return raw
+
+
+def _save_upload(raw: bytes, filename: str = "") -> Path:
+    """Store uploaded bytes under the current scene's uploads/ (isolated)."""
+    stem, ext = os.path.splitext(filename or "")
+    if ext.lower() not in (".png", ".jpg", ".jpeg", ".webp", ".gif"):
+        ext = ".png"
+    name = hashlib.sha1(raw).hexdigest()[:12] + (f"-{_segment(stem)}" if stem else "") + ext
+    up = SC().scene_path.parent / "uploads"
+    up.mkdir(parents=True, exist_ok=True)
+    p = up / name
+    p.write_bytes(raw)
+    return p
+
+
+def _set_base_image(p: Path) -> dict:
+    """Shared core of load_image/load_image_data."""
+    from PIL import Image
+    with Image.open(p) as im:
+        w, h = im.size
+    _snapshot()
+    SC().state.clear()
+    SC().state.update({"image": str(p), "width": w, "height": h,
+                   "effects": [], "objects": []})
+    return _commit()
+
+
 class Scene:
     """One isolated scene: state + undo/redo + lock + its own files."""
 
@@ -272,14 +330,7 @@ def load_image(path: str) -> dict:
     p = _media_path(path)
     if not p.exists():
         raise FileNotFoundError(f"Image not found: {p}")
-    from PIL import Image
-    with Image.open(p) as im:
-        w, h = im.size
-    _snapshot()
-    SC().state.clear()
-    SC().state.update({"image": str(p), "width": w, "height": h,
-                   "effects": [], "objects": []})
-    return _commit()
+    return _set_base_image(p)
 
 
 @mcp.tool()
@@ -711,6 +762,31 @@ def add_image(asset: str, x: float, y: float, w: int, h: int | None = None,
     return _commit(obj)
 
 
+@mcp.tool()
+@serialized
+def load_image_data(image_base64: str, filename: str = "") -> dict:
+    """Set base image from base64 (or data: URL) bytes — no file paths.
+
+    Stores the image inside the scene's own uploads dir; recommended entry
+    point for hosted deployments (TOI_REMOTE_MODE=1)."""
+    raw = _decode_image_b64(image_base64)
+    return _set_base_image(_save_upload(raw, filename))
+
+
+@mcp.tool()
+@serialized
+def add_image_data(image_base64: str, x: float, y: float, w: int,
+                   h: int | None = None, fit: str = "contain",
+                   corner_radius: int = 0, opacity: float = 1.0) -> dict:
+    """Overlay an image from base64 bytes (logo/watermark; no file paths)."""
+    raw = _decode_image_b64(image_base64)
+    obj = S.make_image_object(str(_save_upload(raw, "")), x, y, w, h, fit,
+                              corner_radius, opacity)
+    _snapshot()
+    SC().state["objects"].append(obj)
+    return _commit(obj)
+
+
 
 # --- edits, effects, history, state ----------------------------------------
 
@@ -932,6 +1008,13 @@ def render(preview_width: int = 1024) -> dict:
         out["preview_base64"] = base64.b64encode(buf.getvalue()).decode("ascii")
     return out
 
+
+# TOI_REMOTE_MODE=1 (hosted deployment): the byte-payload tools above fully
+# replace the path-based ones — remove them from tools/list so remote agents
+# never see or can call a local-filesystem API.
+if REMOTE_MODE:
+    mcp.remove_tool("load_image")
+    mcp.remove_tool("add_image")
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()

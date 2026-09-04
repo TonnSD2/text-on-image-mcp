@@ -11,6 +11,8 @@ services:
     environment:
       TOI_USERS: ${TOI_USERS:?set TOI_USERS in .env}
       TOI_MAX_SCENES: ${TOI_MAX_SCENES:-16}
+      TOI_REMOTE_MODE: ${TOI_REMOTE_MODE:-1}
+      TOI_MAX_UPLOAD_MB: ${TOI_MAX_UPLOAD_MB:-20}
     volumes:
       - ./toi-data:/data          # scenes (TOI_DATA) + /data/media
     networks: [mcp]

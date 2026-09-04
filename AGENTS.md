@@ -25,8 +25,9 @@
    invariant, and these guard notices themselves.
 4. **After any user-approved change**, the server must be restarted
    (`.venv/bin/python server.py`, port 8080) and ALL tests must pass:
-   `test_client.py` (e2e A–G), `test_concurrency.py` (race regression) and
-   `test_multisession.py` (scene isolation; spawns its own server on :8098).
+   `test_client.py` (e2e A–H), `test_concurrency.py` (race regression),
+   `test_multisession.py` (scene isolation; spawns its own server on :8098)
+   and `test_remote_mode.py` (hosted/byte-API contract; spawns :8099).
    A change that cannot prove green tests must be reverted.
 5. **Architecture facts you must not "fix":**
    - Multi-scene state: `Scene`/`SceneStore` + a per-request contextvar
@@ -38,6 +39,10 @@
    - `TOI_MEDIA_ROOT` confines client-supplied image paths (`load_image`,
      `add_image`) via `_media_path()`; unset = full local access by design
      (dev/webapp-pool). Never remove that gate.
+   - Byte-payload API `load_image_data`/`add_image_data` (base64 → stored in
+     the scene's own `uploads/` dir; `_decode_image_b64` validates size + real
+     image). `TOI_REMOTE_MODE=1` removes the path tools from tools/list —
+     hosted deployments must keep this pair as the only image entry points.
    - Deployment artifacts (build happens on the VPS, not this machine):
      `Dockerfile` pins `python:3.14.7-slim` + `requirements.lock` (exact venv
      versions — keep in sync after any dependency change),
