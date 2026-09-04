@@ -268,7 +268,18 @@ class BearerAuthMiddleware:
         finally:
             _current.reset(tok)
 
-mcp = MCPServer("text-on-image")
+mcp = MCPServer(
+    "text-on-image",
+    instructions=(
+        "Stateful server: all tools operate on ONE persistent canvas "
+        '("scene") bound to your session; changes survive between calls '
+        "until load_image/load_image_data replaces the base image and "
+        "clears the scene. get_state returns the complete scene JSON - "
+        "store it to persist or restore work across sessions via "
+        "set_state. Scene isolation is handled server-side; hosts may "
+        "address named scenes with the ?scene= URL parameter."
+    ),
+)
 
 # The SDK runs sync tools on worker threads (anyio.to_thread), so concurrent
 # tools/call can genuinely interleave. Each tool body is a transaction under
@@ -326,7 +337,10 @@ def list_fonts() -> dict:
 @mcp.tool()
 @serialized
 def load_image(path: str) -> dict:
-    """Set the base image (png/jpg/webp path, see TOI_MEDIA_ROOT), clear objects/effects."""
+    """Set the base image (png/jpg/webp path, see TOI_MEDIA_ROOT), clear objects/effects.
+
+    Stateful: every tool call keeps mutating this same session scene;
+    this call resets it (new base image, empty objects/effects)."""
     p = _media_path(path)
     if not p.exists():
         raise FileNotFoundError(f"Image not found: {p}")
@@ -768,7 +782,10 @@ def load_image_data(image_base64: str, filename: str = "") -> dict:
     """Set base image from base64 (or data: URL) bytes — no file paths.
 
     Stores the image inside the scene's own uploads dir; recommended entry
-    point for hosted deployments (TOI_REMOTE_MODE=1)."""
+    point for hosted deployments (TOI_REMOTE_MODE=1).
+
+    Stateful: every tool call keeps mutating this same session scene;
+    this call resets it (new base image, empty objects/effects)."""
     raw = _decode_image_b64(image_base64)
     return _set_base_image(_save_upload(raw, filename))
 
@@ -943,7 +960,10 @@ def redo() -> dict:
 @mcp.tool()
 @serialized
 def get_state() -> dict:
-    """Return the full scene JSON (image, effects, all objects with styles)."""
+    """Return the full scene JSON (image, effects, all objects with styles).
+
+    Use it to persist the scene: store the returned JSON and restore it
+    later, in any session, with set_state."""
     return copy.deepcopy(SC().state)
 
 
@@ -960,7 +980,10 @@ def measure_text(object_id: str) -> dict:
 @mcp.tool()
 @serialized
 def set_state(state: dict) -> dict:
-    """Replace the whole scene state with client-provided JSON and re-render."""
+    """Replace the whole scene state with client-provided JSON and re-render.
+
+    The counterpart of get_state: pass back a previously saved scene JSON
+    to restore work into a fresh session."""
     if "objects" not in state:
         raise ValueError("state must contain an 'objects' list")
     _snapshot()
@@ -974,7 +997,10 @@ def set_state(state: dict) -> dict:
 @serialized
 def scene_info() -> dict:
     """Diagnostics of the current scene: workspace, scene key, storage dir,
-    object count, undo depth and how many scenes are live in this process."""
+    object count, undo depth and how many scenes are live in this process.
+
+    The scene key is the server-side isolation identifier bound to your
+    session (from ?scene= / X-TOI-Scene / MCP session id)."""
     sc = SC()
     return {"workspace": sc.workspace, "scene": sc.key, "dir": str(sc.dir),
             "objects": len(SC().state["objects"]), "undo_steps": len(sc.undo),
