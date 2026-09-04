@@ -11,8 +11,10 @@
 
 ## Стек
 - Python 3 + **Pillow** (весь рендер) + **mcp** (SDK 2.x, MCPServer, транспорт Streamable HTTP)
-- 33 бесплатных Google Fonts (статические TTF, скачаны локально), в т.ч.
-  script/display: Lobster, Pacifico, Caveat
+- 23 бесплатных Google Fonts (статические TTF, скачаны локально), в т.ч.
+  script/display: Lobster, Pacifico, Caveat. У всех семейств гарантированно
+  есть кириллица — это проверяет `test_fonts.py` (временные latin-only
+  сборки с квадратами вместо букв из манифеста удалены)
 - 38 инструментов (в `TOI_REMOTE_MODE=1` — 36), 5 типов объектов, rich-text runs,
   градиенты, выравнивание,
   мультисессионность (изолированные сцены), глобальные фото-эффекты, undo/redo
@@ -21,7 +23,7 @@
 ```bash
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
-.venv/bin/python download_fonts.py        # один раз: ~110 TTF в ./fonts
+.venv/bin/python download_fonts.py        # один раз: ~80 TTF в ./fonts (семейства без кириллицы отсеиваются)
 .venv/bin/python server.py                # http://127.0.0.1:8080/mcp
 ```
 
@@ -195,13 +197,18 @@ Linear: `angle=0` — сверху (`from`) вниз (`to`), дальше по �
 .venv/bin/python test_client.py   # полный e2e-прогон всех групп A–G через HTTP
 ```
 
-## Шрифты (33)
-Montserrat, Inter, Roboto, Open Sans, Lato, Poppins, Source Sans 3, Raleway,
+## Шрифты (23)
+Montserrat, Inter, Roboto, Open Sans, Lato, Source Sans 3, Raleway,
 Oswald, Merriweather, Ubuntu, Nunito, Nunito Sans, Playfair Display, Rubik,
-Work Sans, Roboto Condensed, PT Sans, Fira Sans, Barlow, DM Sans, Manrope,
-Karla, Josefin Sans, Libre Baskerville, Cormorant Garamond, Space Grotesk,
-Quicksand, Mulish, Bebas Neue + script/display: Lobster, Pacifico, Caveat.
+Roboto Condensed, PT Sans, Fira Sans, Manrope, Mulish, Cormorant Garamond
++ script/display: Lobster, Pacifico, Caveat.
 
-Pacifico — только латиница. Если у семейства нет italic/bold — Pillow делает
+Все 23 семейства полностью покрывают кириллический набор — это регламентирует
+`test_fonts.py` (запуск без сервера). Семейства, у которых кириллицы нет нигде
+(Poppins, Bebas Neue, DM Sans, Work Sans, Barlow, Josefin Sans, Karla,
+Libre Baskerville, Quicksand, Space Grotesk), намеренно не подключены: они
+рисуют «тофу»-квадраты вместо русских букв.
+
+Если у семейства нет italic/bold — Pillow делает
 псевдо-стиль на CPU (affine-shear / stroke), так что флаги `bold`/`italic`
 работают всегда.

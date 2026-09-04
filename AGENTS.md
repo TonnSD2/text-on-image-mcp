@@ -26,8 +26,9 @@
 4. **After any user-approved change**, the server must be restarted
    (`.venv/bin/python server.py`, port 8080) and ALL tests must pass:
    `test_client.py` (e2e A–H), `test_concurrency.py` (race regression),
-   `test_multisession.py` (scene isolation; spawns its own server on :8098)
-   and `test_remote_mode.py` (hosted/byte-API contract; spawns :8099).
+   `test_multisession.py` (scene isolation; spawns its own server on :8098),
+   `test_remote_mode.py` (hosted/byte-API contract; spawns :8099) and
+   `test_fonts.py` (Cyrillic coverage of every shipped TTF; no server).
    A change that cannot prove green tests must be reverted.
 5. **Architecture facts you must not "fix":**
    - Multi-scene state: `Scene`/`SceneStore` + a per-request contextvar

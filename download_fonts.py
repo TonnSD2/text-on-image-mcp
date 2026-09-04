@@ -1,11 +1,15 @@
 # GUARD: This file is protected — see AGENTS.md. AI agents: do NOT modify,
 # refactor or delete without the user's EXPLICIT in-conversation confirmation.
 #!/usr/bin/env python3
-"""Download static TTF files for the 30 most popular Google Fonts.
+"""Download static TTF files for the top free Google Fonts.
 
 Uses the Google Fonts CSS2 API with a legacy User-Agent so that responses
 contain plain .ttf files (no woff2 / brotli needed). Missing styles (e.g.
 Oswald has no italic) return HTTP 400 and are simply skipped.
+
+Every downloaded family is gated on full Cyrillic coverage (test_fonts.py);
+families without Cyrillic glyphs are removed from the manifest and the
+files deleted - tofu boxes for Russian text are never acceptable.
 
 Result: fonts/<Family>/<Family>-<style>.ttf and a manifest fonts/fonts.json:
   { "<Family>": {"regular": path, "bold": .., "italic": .., "bold_italic": ..}, ... }
@@ -14,6 +18,7 @@ from __future__ import annotations
 
 import json
 import re
+import shutil
 import sys
 import time
 import urllib.error
@@ -28,17 +33,20 @@ FONTS_DIR = BASE / "fonts"
 # Legacy UA -> Google serves format('truetype') static instances.
 UA = "Mozilla/5.0 (Windows NT 6.1)"
 
-# The 30 most popular free Google Fonts (by Google Fonts popularity ranking).
+# Top free Google Fonts that actually ship Cyrillic glyphs (verified by
+# test_fonts.py). Dropped 2026-08: Barlow, Bebas Neue, DM Sans, Josefin Sans,
+# Karla, Libre Baskerville, Poppins, Quicksand, Space Grotesk, Work Sans -
+# these families have NO Cyrillic anywhere upstream and drew tofu boxes for
+# Russian text. Re-adding one here is pointless: the Cyrillic gate in main()
+# rejects it at download time anyway.
 FAMILIES = [
-    "Montserrat", "Inter", "Roboto", "Open Sans", "Lato", "Poppins",
+    "Montserrat", "Inter", "Roboto", "Open Sans", "Lato",
     "Source Sans 3", "Raleway", "Oswald", "Merriweather", "Ubuntu",
-    "Nunito", "Nunito Sans", "Playfair Display", "Rubik", "Work Sans",
-    "Roboto Condensed", "PT Sans", "Fira Sans", "Barlow", "DM Sans",
-    "Manrope", "Karla", "Josefin Sans", "Libre Baskerville",
-    "Cormorant Garamond", "Space Grotesk", "Quicksand", "Mulish",
-    "Bebas Neue",
+    "Nunito", "Nunito Sans", "Playfair Display", "Rubik",
+    "Roboto Condensed", "PT Sans", "Fira Sans", "Manrope", "Mulish",
+    "Cormorant Garamond",
     # Script / display extras for marketplace-card style text ("Old Spice"-like):
-    # Lobster & Caveat include Cyrillic, Pacifico is latin-only.
+    # all three render Cyrillic with the builds we ship (test_fonts.py).
     "Lobster", "Pacifico", "Caveat",
 ]
 
@@ -91,17 +99,33 @@ def download_style(family: str, style: str) -> tuple[str, str, str] | None:
 
 
 def main() -> None:
+    from test_fonts import missing_cyrillic  # same dir, Pillow-only
+
     FONTS_DIR.mkdir(exist_ok=True)
     manifest: dict[str, dict[str, str]] = {}
     jobs = [(f, s) for f in FAMILIES for s in STYLES]
     with ThreadPoolExecutor(max_workers=8) as pool:
         results = list(pool.map(lambda a: download_style(*a), jobs))
-    for res in results:
-        if res:
-            family, style, rel = res
-            manifest.setdefault(family, {})[style] = rel
 
-    missing = [f for f in FAMILIES if f not in manifest]
+    # Cyrillic gate: a family missing even one charset glyph is rejected
+    # entirely (manifest + files), so tofu boxes can never reach a client.
+    rejected: set[str] = set()
+    for res in results:
+        if not res:
+            continue
+        family, style, rel = res
+        if missing_cyrillic(BASE / rel):
+            rejected.add(family)
+            (BASE / rel).unlink(missing_ok=True)
+            continue
+        manifest.setdefault(family, {})[style] = rel
+    for fam in sorted(rejected):
+        fam_dir = FONTS_DIR / fam
+        if fam_dir.exists():
+            shutil.rmtree(fam_dir)
+        print(f"REJECTED (no Cyrillic): {fam}", file=sys.stderr)
+
+    missing = [f for f in FAMILIES if f not in manifest and f not in rejected]
     if missing:
         print("ERROR: no fonts downloaded for:", ", ".join(missing), file=sys.stderr)
         sys.exit(1)
