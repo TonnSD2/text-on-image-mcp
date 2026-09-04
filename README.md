@@ -99,7 +99,7 @@ http://HOST:8080/mcp?token=TOK&scene=job-2   # поток 2 — параллел
 
 ```bash
 # На VPS (docker + compose plugin, домен уже указывает A-записью на хост):
-git clone <repo> && cd text-mcp        # или rsync каталога
+git clone git@github.com:TonnSD2/text-on-image-mcp.git && cd text-on-image-mcp
 cp .env.example .env                   # TOI_DOMAIN + TOI_USERS (openssl rand -hex 16)
 docker compose up -d --build
 BASE=https://<домен> TOKEN=<токен> bash test_deploy_smoke.sh
