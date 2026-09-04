@@ -76,7 +76,7 @@ undo/redo + свой `scene.json`/`output.png` + свой lock. Одна тих�
 | Переменная | Назначение |
 |---|---|
 | `TOI_USERS="tokA=alice,tokB=bob"` | токен → workspace; у каждого свои сцены (изоляция и по ключу, и по директории) |
-| `TOI_AUTH_TOKEN` | один токен = workspace `default` |
+| `TOI_AUTH_TOKEN` | один токен = workspace `default` (легаси; для деплоя предпочтителен `TOI_USERS=<токен>=me`) |
 | `TOI_DATA` | корень сцен (default `<workdir>/sessions`); layout `<TOI_DATA>/<workspace>/<scene>/` |
 | `TOI_MAX_SCENES` | LRU-лимит живых сцен в памяти (default 16; состояние на диске, вытеснение безопасно, теряется только undo-история) |
 | `TOI_MEDIA_ROOT` | если задан — `load_image`/`add_image` принимают только пути внутри этого корня (resolve до проверки: `..` и симлинки не работают). Не задан = полный локальный доступ (dev/webapp-пул). **Для внешнего хостинга обязателен** |
@@ -101,6 +101,7 @@ http://HOST:8080/mcp?token=TOK&scene=job-2   # поток 2 — параллел
 # На VPS (docker + compose plugin, домен уже указывает A-записью на хост):
 git clone git@github.com:TonnSD2/text-on-image-mcp.git && cd text-on-image-mcp
 cp .env.example .env                   # TOI_DOMAIN + TOI_USERS (openssl rand -hex 16)
+# один клиент: TOI_USERS=<openssl rand -hex 16>=me
 docker compose up -d --build
 BASE=https://<домен> TOKEN=<токен> bash test_deploy_smoke.sh
 ```
