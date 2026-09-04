@@ -89,8 +89,10 @@ async def main() -> None:
                 return payload(res)
 
             fonts = await call("list_fonts")
-            assert fonts["count"] >= 33, "expected 33+ families"
-            for extra in ("Lobster", "Pacifico", "Caveat"):
+            # 23 families: 10 latin-only families (no Cyrillic upstream) were
+            # dropped from fonts/fonts.json — every remaining family renders Cyrillic.
+            assert fonts["count"] >= 23, "expected 23+ families"
+            for extra in ("Lobster", "Pacifico", "Caveat", "Lato"):
                 assert extra in fonts["families"], f"missing {extra}"
             print(f"\nFONTS: {fonts['count']} OK")
             await call("load_image", path=photo)
